@@ -30,7 +30,7 @@ const aptgroundRoutes = require('./routes/aptgrounds');
 const reviewRoutes = require('./routes/reviews');
 
 const MongoDBStore = require("connect-mongo")(session);
-//const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-apt';
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/yelp-apt';
 //connect to database
 // mongoose.connect(dbUrl, {
 //     // useNewUrlParser: true,
@@ -38,7 +38,7 @@ const MongoDBStore = require("connect-mongo")(session);
 //     // useUnifiedTopology: trues,
 //     //useFindAndModify: false
 // });
-const dbUrl =  'mongodb://localhost:27017/yelp-apt';
+// const dbUrl =  'mongodb://localhost:27017/yelp-apt';
 mongoose.connect(dbUrl, {
     // useNewUrlParser: true,
     // useCreateIndex: true,
@@ -63,9 +63,10 @@ app.use(mongoSanitize({
     replaceWith: '_'
 }))
 
+const secret = process.env.SECRET || 'thisshouldbeabettersecret!';
 const store = new MongoDBStore({
     url: dbUrl,
-    secret: 'thisshouldbeabettersecret!',
+    secret,
     touchAfter: 24 * 60 * 60
 });
 
@@ -79,7 +80,7 @@ store.on("error", function (e) {
 const sessionConfig = {
     store,
     name: 'session',
-    secret: 'thisshouldbeabettersecret!',
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -197,8 +198,9 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err })
 })
 
-app.listen(3000, () => {
-    console.log('Serving on port 3000')
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`Serving on port ${port}`)
 })
 
 
